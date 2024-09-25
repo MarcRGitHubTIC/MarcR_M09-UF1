@@ -41,26 +41,12 @@ public class rot13{
         return letra;
     }
     
-    // Método para verificar solo letras
-    public static boolean esSoloLetras(String cadena) {
-        for (char c : cadena.toCharArray()) {
-            if (!Character.isLetter(c)) {
-                return false; 
-            }
-        }
-        return true;
-    }
-
+   
     
     public static void main(String[] args) {
         try (Scanner input = new Scanner(System.in)) {
 			System.out.println("Introduzca texto para cifrar:");
 			String palabra=input.nextLine();
-			
-			// Verificar si el input contiene solo letras
-            if (!esSoloLetras(palabra)) {
-                throw new IllegalArgumentException("Error: El input contiene caracteres no alfabéticos.");
-            }
             
 			String palabraCifrada=cifraROT13(palabra);
 			String palabraDescifrada= deszifraRot13(palabraCifrada);
