@@ -7,6 +7,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 public class Hashes {
+	
+    public int npass = 0;  
 
     public String getSHA512AmbSalt(String pw, String salt) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-512");
@@ -23,27 +25,109 @@ public class Hashes {
         HexFormat hex = HexFormat.of();
         return hex.formatHex(hash);
     }
+    
+    public String getInterval(long t1, long t2) {
+        long diff = t2 - t1;
+        long days = diff / (1000 * 60 * 60 * 24);
+        long hours = (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+        long minutes = (diff % (1000 * 60 * 60)) / (1000 * 60);
+        long seconds = (diff % (1000 * 60)) / 1000;
+        long millis = diff % 1000;
+        return String.format("%d dies / %d hores / %d minuts / %d segons / %d millis", days, hours, minutes, seconds, millis);
+    }
 
-    public int npass = 0;  
     public String forcaBruta(String alg, String hash, String salt) throws Exception {
         String charset = "abcdefABCDEF1234567890!";
         char[] password = new char[6];
         String result = null;
+
+        int totalAttempts = 0;
+
         outerLoop:
         for (char c1 : charset.toCharArray()) {
+            password[0] = c1;
+            String attempt = new String(password, 0, 1);
+            totalAttempts++;
+            if (alg.equals("SHA-512")) {
+                if (getSHA512AmbSalt(attempt, salt).equals(hash)) {
+                    result = attempt;
+                    break outerLoop;
+                }
+            } else if (alg.equals("PBKDF2")) {
+                if (getPBKDF2AmbSalt(attempt, salt).equals(hash)) {
+                    result = attempt;
+                    break outerLoop;
+                }
+            }
+
             for (char c2 : charset.toCharArray()) {
+                password[1] = c2;
+                attempt = new String(password, 0, 2);
+                totalAttempts++;
+                if (alg.equals("SHA-512")) {
+                    if (getSHA512AmbSalt(attempt, salt).equals(hash)) {
+                        result = attempt;
+                        break outerLoop;
+                    }
+                } else if (alg.equals("PBKDF2")) {
+                    if (getPBKDF2AmbSalt(attempt, salt).equals(hash)) {
+                        result = attempt;
+                        break outerLoop;
+                    }
+                }
+
                 for (char c3 : charset.toCharArray()) {
+                    password[2] = c3;
+                    attempt = new String(password, 0, 3);
+                    totalAttempts++;
+                    if (alg.equals("SHA-512")) {
+                        if (getSHA512AmbSalt(attempt, salt).equals(hash)) {
+                            result = attempt;
+                            break outerLoop;
+                        }
+                    } else if (alg.equals("PBKDF2")) {
+                        if (getPBKDF2AmbSalt(attempt, salt).equals(hash)) {
+                            result = attempt;
+                            break outerLoop;
+                        }
+                    }
+
                     for (char c4 : charset.toCharArray()) {
+                        password[3] = c4;
+                        attempt = new String(password, 0, 4);
+                        totalAttempts++;
+                        if (alg.equals("SHA-512")) {
+                            if (getSHA512AmbSalt(attempt, salt).equals(hash)) {
+                                result = attempt;
+                                break outerLoop;
+                            }
+                        } else if (alg.equals("PBKDF2")) {
+                            if (getPBKDF2AmbSalt(attempt, salt).equals(hash)) {
+                                result = attempt;
+                                break outerLoop;
+                            }
+                        }
+
                         for (char c5 : charset.toCharArray()) {
+                            password[4] = c5;
+                            attempt = new String(password, 0, 5);
+                            totalAttempts++;
+                            if (alg.equals("SHA-512")) {
+                                if (getSHA512AmbSalt(attempt, salt).equals(hash)) {
+                                    result = attempt;
+                                    break outerLoop;
+                                }
+                            } else if (alg.equals("PBKDF2")) {
+                                if (getPBKDF2AmbSalt(attempt, salt).equals(hash)) {
+                                    result = attempt;
+                                    break outerLoop;
+                                }
+                            }
+
                             for (char c6 : charset.toCharArray()) {
-                                password[0] = c1;
-                                password[1] = c2;
-                                password[2] = c3;
-                                password[3] = c4;
-                                password[4] = c5;
                                 password[5] = c6;
-                                String attempt = new String(password);
-                                npass++;
+                                attempt = new String(password, 0, 6);
+                                totalAttempts++;
                                 if (alg.equals("SHA-512")) {
                                     if (getSHA512AmbSalt(attempt, salt).equals(hash)) {
                                         result = attempt;
@@ -61,22 +145,15 @@ public class Hashes {
                 }
             }
         }
+
+        this.npass = totalAttempts;  
         return result;
     }
 
-    public String getInterval(long t1, long t2) {
-        long diff = t2 - t1;
-        long days = diff / (1000 * 60 * 60 * 24);
-        long hours = (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
-        long minutes = (diff % (1000 * 60 * 60)) / (1000 * 60);
-        long seconds = (diff % (1000 * 60)) / 1000;
-        long millis = diff % 1000;
-        return String.format("%d dies / %d hores / %d minuts / %d segons / %d millis", days, hours, minutes, seconds, millis);
-    }
 
     public static void main(String[] args) throws Exception {
         String salt = "qpoweiruañslkdfjz";
-        String pw = "aaabF!";
+        String pw = "ab";
         Hashes h = new Hashes();
         String[] aHashes = {
             h.getSHA512AmbSalt(pw, salt),
