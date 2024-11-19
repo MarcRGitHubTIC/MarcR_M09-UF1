@@ -153,7 +153,7 @@ public class Hashes {
 
     public static void main(String[] args) throws Exception {
         String salt = "qpoweiruañslkdfjz";
-        String pw = "ab";
+        String pw = "aaabF!";
         Hashes h = new Hashes();
         String[] aHashes = {
             h.getSHA512AmbSalt(pw, salt),
